@@ -278,39 +278,31 @@ const char body[] PROGMEM = R"===(
         autopilot_off_button.classList.remove("active");
       }
 
+      var prev_state = null
       document.addEventListener("keypress", function (event) {
-        var forward_button = document.getElementById("forward_button");
-        var backward_button = document.getElementById("backward_button");
-        var left_button = document.getElementById("left_button");
-        var right_button = document.getElementById("right_button");
-        var stop_button = document.getElementById("stop_button");
-        
+        if(event.key == prev_state){return;}
         if (event.key == 'w') {
-          forward();
           activateDirectionButtons("forward_button");
         }
         if (event.key == "s") {
-          backward();
           activateDirectionButtons("backward_button");
         }
         if (event.key == "a") {
-          turn_left();
           activateDirectionButtons("left_button");
         }
         if (event.key == "d") {
-          turn_right();
           activateDirectionButtons("right_button"); 
         }
         if (event.key == "x") {
-          stop();
           activateDirectionButtons("stop_button");
         }
+        prev_state = event.key;
       });
 
       // release
       document.addEventListener("keyup", function (event) {
-        stop();
         activateDirectionButtons("stop_button");
+        prev_state = null;
       });
 
       var speed = document.getElementById("speed_slider");
