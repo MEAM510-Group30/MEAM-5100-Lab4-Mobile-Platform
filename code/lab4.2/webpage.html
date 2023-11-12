@@ -125,7 +125,7 @@
     <div style="text-align: center">
       <input
         type="range"
-        min="0"
+        min="1600"
         max="4095"
         value="4000"
         class="slider"
@@ -276,8 +276,20 @@
         autopilot_on_button.classList.remove("active");
         autopilot_off_button.classList.remove("active");
       }
+      
+      function speedup() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "+", true);
+        xhttp.send();
+      }
 
-      var prev_state = null
+      function slowdown() {
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "-", true);
+        xhttp.send();
+      }
+
+      var prev_state = null;
       document.addEventListener("keypress", function (event) {
         if(event.key == prev_state){return;}
         if (event.key == 'w') {
@@ -295,13 +307,21 @@
         if (event.key == "x") {
           activateDirectionButtons("stop_button");
         }
+        if (event.key == '+') {
+          speedup();
+        }
+        if (event.key == '-') {
+          slowdown();
+        }
         prev_state = event.key;
       });
 
-      // release
+      // release WASD keys
       document.addEventListener("keyup", function (event) {
-        activateDirectionButtons("stop_button");
-        prev_state = null;
+        if (prev_state == 'w' || prev_state == 's' || prev_state == 'a' || prev_state == 'd') {
+          activateDirectionButtons("stop_button");
+          prev_state = null;
+        }
       });
 
       var speed = document.getElementById("speed_slider");
@@ -322,10 +342,31 @@
         displayTurnRate();
       }
 
+      function send_speed_onload() {
+        // send speed value on load
+        var speed_slider_value = document.getElementById("speed_val");
+        var xhttp = new XMLHttpRequest();
+        var str = "speed_slider=";
+        var res = str.concat(speed_slider_value);
+        xhttp.open("GET", res, true);
+        xhttp.send();
+      }
+
+      function send_turn_rate_onload() {
+        var speed_slider_value = document.getElementById("turn_rate_val");
+        var xhttp = new XMLHttpRequest();
+        var str = "turn_rate_slider=";
+        var res = str.concat(speed_slider_value);
+        xhttp.open("GET", res, true);
+        xhttp.send();
+      }
+
       window.onload = function () {
         display();
         activateDirectionButtons("stop_button");
         activateAutopilotButton("autopilot_off_button");
+        send_speed_onload();
+        send_turn_rate_onload();
       };
     </script>
   </body>

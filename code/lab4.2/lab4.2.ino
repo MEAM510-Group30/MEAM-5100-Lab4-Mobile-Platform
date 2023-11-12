@@ -33,8 +33,8 @@ HTML510Server html_server(80);
 // motor directions
 // #define DIR_PIN_00 7   // motor 0 direction control pin 0
 // #define DIR_PIN_01 10  // motor 0 direction control pin 1
-#define DIR_PIN_00 10   // motor 0 direction control pin 0
-#define DIR_PIN_01 7  // motor 0 direction control pin 1
+#define DIR_PIN_00 10  // motor 0 direction control pin 0
+#define DIR_PIN_01 7   // motor 0 direction control pin 1
 #define DIR_PIN_10 18  // motor 1 direction control pin 0
 #define DIR_PIN_11 19  // motor 1 direction control pin 1
 
@@ -48,7 +48,8 @@ HTML510Server html_server(80);
 #define LEDC_FREQ 5000
 
 // motor global variables
-int des_speed = 0;          // car desired speed, 0 - 4095
+int des_speed = 4000;       // car desired speed, 0 - 4095
+int des_speed_delta = 0;    // deriviation of desired speed, this var is used for accelating and slowing down using keyboard + and -
 uint8_t motor_0_dir = 1;    // left wheel, 1 - forward, 0 - backward
 uint8_t motor_1_dir = 1;    // right wheel, 1 - forward, 0 - backward
 int motor_0_des_speed = 0;  // left wheel, 0 - 4095
@@ -96,11 +97,12 @@ int8_t autopilot_turnrate_arr[autopilot_series_len] = { 30, 30, 30, 30, 30 };   
 int desiredSpeedLWheel(char action) {
   float rate = turn_rate;
   float Lspeed;
+  des_speed += des_speed_delta;
   switch (action) {
     case 'F':
       return des_speed;
     case 'B':
-      return -des_speed;
+      return des_speed;
     case 'L':  // slower
       rate /= 100;
       if (des_speed * (1.0 + 0.5 * rate) > LEDC_RES) {
@@ -122,6 +124,7 @@ int desiredSpeedLWheel(char action) {
 int desiredSpeedRWheel(char action) {
   float rate = turn_rate;
   float Rspeed;
+  des_speed += des_speed_delta;
   switch (action) {
     case 'F':
       return des_speed;
@@ -347,6 +350,27 @@ void handleAutopilotOff() {
 //   }
 // }
 
+void handleSpeedUp() {
+  int delta_speed = 10;
+  if (des_speed + des_speed_delta + delta_speed > 4095) {
+    des_speed_delta = 4095 - des_speed;
+  } else {
+    des_speed_delta += delta_speed;
+  }
+  Serial.print("\nSpeed up: ");
+  Serial.print(des_speed + des_speed_delta);
+}
+void handleSlowDown() {
+  int delta_speed = -10;
+  if (des_speed + delta_speed + des_speed_delta < 1600) {
+    des_speed_delta = 1600 - des_speed;
+  } else {
+    des_speed_delta += delta_speed;
+  }
+  Serial.print("\nSlow down: ");
+  Serial.print(des_speed + des_speed_delta);
+}
+
 void setup() {
   Serial.begin(115200);
 
@@ -400,6 +424,8 @@ void setup() {
   html_server.attachHandler("/R", handleForwardRight);
   html_server.attachHandler("/O", handleStop);
   html_server.attachHandler("/S", handleStop);
+  html_server.attachHandler("/+", handleSpeedUp);
+  html_server.attachHandler("/-", handleSlowDown);
   delay(500);
 }
 
