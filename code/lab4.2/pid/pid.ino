@@ -14,7 +14,7 @@ volatile unsigned long prevTime_0 = 0;
 volatile unsigned long prevTime_1 = 0;
 
 float Kp = 2, Ki = 0.3, Kd = 0.001;
-float Setpoint_0 = 50.0;  // seems unused
+// float Setpoint_0 = 50.0;  // seems unused
 float last_RPM_0 = 0;
 float last_RPM_1 = 0;
 float integral_0 = 0;
@@ -22,7 +22,7 @@ float integral_1 = 0;
 float derivative_0 = 0;
 float derivative_1 = 0;
 
-int Output_0 = 0;  // seems unused
+// int Output_0 = 0;  // seems unused
 float RPM_0 = 0.0;
 float RPM_1 = 0.0;
 float deltaTime_0 = 0.0;
@@ -30,20 +30,13 @@ float deltaTime_1 = 0.0;
 
 unsigned long lastTime_0 = 0;
 unsigned long lastTime_1 = 0;
-unsigned long currentTime_0 = 0;  // seems usused
-unsigned long currentTime_1 = 0;
+// unsigned long currentTime_0 = 0;  // seems usused
 
 int call_PID_flag_0 = 0;
 int call_PID_flag_1 = 0;
 
 
-int calculatePID_0(float setpoint, float Kp, float Ki, float Kd, float &lastInput, unsigned long &lastTime, float RPM_val)
-{
-  // Serial.print("RPM: ");
-  // Serial.println(RPM);
-  // Serial.print("DeltaTime: ");
-  // Serial.println(deltaTime);
-
+int calculatePID_0(float setpoint, float Kp, float Ki, float Kd, float &lastInput, unsigned long &lastTime, float RPM_val) {
   float error = setpoint - RPM_val;
   // float integral = integral + error;
   integral_0 = integral_0 + error;
@@ -51,40 +44,42 @@ int calculatePID_0(float setpoint, float Kp, float Ki, float Kd, float &lastInpu
   int output = Kp * error + Ki * integral_0 + constrain(Kd * derivative_0, -0.1 * Kp * error, 0.1 * Kp * error);
   output = constrain(output, -80, 40);
 
-  // Print individual components for debugging
-  // Serial.print("Error: ");
-  // Serial.println(error);
-  // Serial.print("P Term: ");
-  // Serial.println(Kp * error);
-  // Serial.print("I Term: ");
-  // Serial.println(Ki * integral);
-  // Serial.print("D Term: ");
-  // Serial.println(Kd * derivative);
-  // Serial.print("Output: ");
-  // Serial.println(output);
-  // Serial.println(error);
-
   last_RPM_0 = RPM_val;
   return output;
 }
 
 
-void setup()
-{
+int calculatePID_1(float setpoint, float Kp, float Ki, float Kd, float &lastInput, unsigned long &lastTime, float RPM_val) {
+  float error = setpoint - RPM_val;
+  // float integral = integral + error;
+  integral_1 = integral_1 + error;
+  derivative_1 = 1000 * (RPM_val - last_RPM_1) / 1;
+  int output = Kp * error + Ki * integral_1 + constrain(Kd * derivative_1, -0.1 * Kp * error, 0.1 * Kp * error);
+  output = constrain(output, -80, 40);
+
+  last_RPM_1 = RPM_val;
+  return output;
+}
+
+
+void setup() {
   Serial.begin(115200);
 
-  // 初始化LEDC用于电机控制
   ledcSetup(LEDC_0, LEDC_FREQ, LEDC_RES);
+  ledcSetup(LEDC_1, LEDC_FREQ, LEDC_RES);
   ledcAttachPin(MOTOR_0, LEDC_0);
+  ledcAttachPin(MOTOR_1, LEDC_1);
 
   // Set encoder and photointerrupter pins as inputs
   pinMode(ENCODER_0, INPUT_PULLUP);
+  pinMode(ENCODER_1, INPUT_PULLUP);
   // Attach an interrupt for the encoder signal
-  attachInterrupt(digitalPinToInterrupt(ENCODER_0), handleEncoderInterrupt, HIGH);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_0), handleEncoderInterrupt_0, HIGH);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_1), handleEncoderInterrupt_1, HIGH);
 }
 
-void loop()
-{
+
+void loop() {
   int setpoint = 70;
 
   if (call_PID_flag_0 == 1) {
@@ -101,8 +96,7 @@ void loop()
 }
 
 
-void handleEncoderInterrupt()
-{
+void handleEncoderInterrupt_0() {
   encoderCount_0++;
   if (encoderCount_0 == 1) {
     call_PID_flag_0 = 1;
@@ -110,5 +104,16 @@ void handleEncoderInterrupt()
     deltaTime_0 = (currentTime - lastTime_0);  // Convert milliseconds to seconds
     RPM_0 = (60 * 1 * 1000) / (20 * deltaTime_0);
     lastTime_0 = currentTime;
+  }
+}
+
+void handleEncoderInterrupt_1() {
+  encoderCount_1++;
+  if (encoderCount_1 == 1) {
+    call_PID_flag_1 = 1;
+    unsigned long currentTime = millis();
+    deltaTime_1 = (currentTime - lastTime_1);  // Convert milliseconds to seconds
+    RPM_1 = (60 * 1 * 1000) / (20 * deltaTime_1);
+    lastTime_1 = currentTime;
   }
 }
