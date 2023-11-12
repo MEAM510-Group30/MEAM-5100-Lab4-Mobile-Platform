@@ -277,7 +277,9 @@
         autopilot_off_button.classList.remove("active");
       }
 
-      document.addEventListener("keypress", function (event) {       
+      var prev_state = null
+      document.addEventListener("keypress", function (event) {
+        if(event.key == prev_state){return;}
         if (event.key == 'w') {
           activateDirectionButtons("forward_button");
         }
@@ -293,11 +295,13 @@
         if (event.key == "x") {
           activateDirectionButtons("stop_button");
         }
+        prev_state = event.key;
       });
 
       // release
       document.addEventListener("keyup", function (event) {
         activateDirectionButtons("stop_button");
+        prev_state = null;
       });
 
       var speed = document.getElementById("speed_slider");
