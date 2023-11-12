@@ -13,7 +13,7 @@ const char body[] PROGMEM = R"===(
       }
 
       .button {
-        padding: 8% 10%;
+        padding: 5% 7%;
         font-size: 100%;
         text-align: center;
         cursor: pointer;
@@ -70,7 +70,7 @@ const char body[] PROGMEM = R"===(
       <button
         id="forward_button"
         class="button"
-        onclick="activateButton('forward_button')"
+        onclick="activateDirectionButtons('forward_button')"
       >
         F
       </button>
@@ -79,21 +79,21 @@ const char body[] PROGMEM = R"===(
       <button
         id="left_button"
         class="button"
-        onclick="activateButton('left_button')"
+        onclick="activateDirectionButtons('left_button')"
       >
         L
       </button>
       <button
         id="stop_button"
         class="button"
-        onclick="activateButton('stop_button')"
+        onclick="activateDirectionButtons('stop_button')"
       >
         O
       </button>
       <button
         id="right_button"
         class="button"
-        onclick="activateButton('right_button')"
+        onclick="activateDirectionButtons('right_button')"
       >
         R
       </button>
@@ -102,7 +102,7 @@ const char body[] PROGMEM = R"===(
       <button
         id="backward_button"
         class="button"
-        onclick="activateButton('backward_button')"
+        onclick="activateDirectionButtons('backward_button')"
       >
         B
       </button>
@@ -117,7 +117,7 @@ const char body[] PROGMEM = R"===(
         value="20"
         class="slider"
         id="turn_rate_slider"
-        oninput="display_turn_rate()"
+        oninput="displayTurnRate()"
       />
     </div>
     <p>Turn rate: <span id="turn_rate_val"></span>%</p>    
@@ -131,10 +131,28 @@ const char body[] PROGMEM = R"===(
         value="0"
         class="slider"
         id="speed_slider"
-        oninput="display_speed()"
+        oninput="displaySpeed()"
       />
     </div>
     <p>Speed: <span id="speed_val"></span></p>
+
+    <h2>Autopilot</h2>
+    <div style="text-align: center">
+      <button
+        id="autopilot_on_button"
+        class="button"
+        onclick="activateAutopilotButton('autopilot_on_button')"
+      >
+        On
+      </button>
+      <button
+      id="autopilot_off_button"
+      class="button"
+      onclick="activateAutopilotButton('autopilot_off_button')"
+    >
+      Off
+    </button>
+    </div>
 
     <script>
       speed_slider.onchange = function () {
@@ -163,7 +181,7 @@ const char body[] PROGMEM = R"===(
         xhttp.send();
       };
 
-      function activateButton(buttonId) {
+      function activateDirectionButtons(buttonId) {
         // get the button element by id
         var forward_button = document.getElementById("forward_button");
         var backward_button = document.getElementById("backward_button");
@@ -171,10 +189,10 @@ const char body[] PROGMEM = R"===(
         var right_button = document.getElementById("right_button");
         var stop_button = document.getElementById("stop_button");
 
-        remove_all_active(); // remove all active class from the buttons
+        removeAllActiveDirectionButtons(); // remove all active class from the buttons
 
         if (buttonId == "forward_button") {
-          //remove_all_active(); // remove all active class from the buttons
+          //removeAllActiveDirectionButtons(); // remove all active class from the buttons
           forward_button.classList.add("active"); // add active class to the button
           var xhttp = new XMLHttpRequest();
           xhttp.open("GET", "F", true);
@@ -182,7 +200,7 @@ const char body[] PROGMEM = R"===(
         }
 
         if (buttonId == "left_button") {
-          //remove_all_active();
+          //removeAllActiveDirectionButtons();
           left_button.classList.add("active");
           var xhttp = new XMLHttpRequest();
           xhttp.open("GET", "L", true);
@@ -190,7 +208,7 @@ const char body[] PROGMEM = R"===(
         }
 
         if (buttonId == "stop_button") {
-          //remove_all_active();
+          //removeAllActiveDirectionButtons();
           stop_button.classList.add("active");
           var xhttp = new XMLHttpRequest();
           xhttp.open("GET", "O", true);
@@ -198,7 +216,7 @@ const char body[] PROGMEM = R"===(
         }
 
         if (buttonId == "right_button") {
-          //remove_all_active();
+          //removeAllActiveDirectionButtons();
           right_button.classList.add("active");
           var xhttp = new XMLHttpRequest();
           xhttp.open("GET", "R", true);
@@ -206,7 +224,7 @@ const char body[] PROGMEM = R"===(
         }
 
         if (buttonId == "backward_button") {
-          //remove_all_active();
+          //removeAllActiveDirectionButtons();
           backward_button.classList.add("active");
           var xhttp = new XMLHttpRequest();
           xhttp.open("GET", "B", true);
@@ -214,7 +232,7 @@ const char body[] PROGMEM = R"===(
         }
       }
 
-      function remove_all_active() {
+      function removeAllActiveDirectionButtons() {
         var forward_button = document.getElementById("forward_button");
         var backward_button = document.getElementById("backward_button");
         var left_button = document.getElementById("left_button");
@@ -228,6 +246,38 @@ const char body[] PROGMEM = R"===(
         stop_button.classList.remove("active");
       }
 
+      function activateAutopilotButton(buttonId) {
+        // get the button element by id
+        var autopilot_on_button = document.getElementById("autopilot_on_button");
+        var autopilot_off_button = document.getElementById("autopilot_off_button");
+
+        removeAllActiveAutopilotButtons(); // remove all active class from the buttons
+
+        if (buttonId == "autopilot_on_button") {
+          //removeAllActiveDirectionButtons(); // remove all active class from the buttons
+          autopilot_on_button.classList.add("active"); // add active class to the button
+          var xhttp = new XMLHttpRequest();
+          xhttp.open("GET", "autopilot_on", true);
+          xhttp.send();
+        }
+
+        if (buttonId == "autopilot_off_button") {
+          //removeAllActiveDirectionButtons();
+          autopilot_off_button.classList.add("active");
+          var xhttp = new XMLHttpRequest();
+          xhttp.open("GET", "autopilot_off", true);
+          xhttp.send();
+        }
+      }
+
+      function removeAllActiveAutopilotButtons() {
+        var autopilot_on_button = document.getElementById("autopilot_on_button");
+        var autopilot_off_button = document.getElementById("autopilot_off_button");
+
+        autopilot_on_button.classList.remove("active");
+        autopilot_off_button.classList.remove("active");
+      }
+
       document.addEventListener("keypress", function (event) {
         var forward_button = document.getElementById("forward_button");
         var backward_button = document.getElementById("backward_button");
@@ -237,53 +287,54 @@ const char body[] PROGMEM = R"===(
         
         if (event.key == 'w') {
           forward();
-          activateButton("forward_button");
+          activateDirectionButtons("forward_button");
         }
         if (event.key == "s") {
           backward();
-          activateButton("backward_button");
+          activateDirectionButtons("backward_button");
         }
         if (event.key == "a") {
           turn_left();
-          activateButton("left_button");
+          activateDirectionButtons("left_button");
         }
         if (event.key == "d") {
           turn_right();
-          activateButton("right_button"); 
+          activateDirectionButtons("right_button"); 
         }
         if (event.key == "x") {
           stop();
-          activateButton("stop_button");
+          activateDirectionButtons("stop_button");
         }
       });
 
       // release
       document.addEventListener("keyup", function (event) {
         stop();
-        activateButton("stop_button");
+        activateDirectionButtons("stop_button");
       });
 
       var speed = document.getElementById("speed_slider");
       var turn_Rate = document.getElementById("turn_rate_slider");
 
-      function display_speed() {
+      function displaySpeed() {
         var output_speed = document.getElementById("speed_val");
         output_speed.innerHTML = speed_slider.value;
       }
 
-      function display_turn_rate() {
+      function displayTurnRate() {
         var output_turn_rate = document.getElementById("turn_rate_val");
         output_turn_rate.innerHTML = turn_rate_slider.value;
       }
 
       function display() {
-        display_speed();
-        display_turn_rate();
+        displaySpeed();
+        displayTurnRate();
       }
 
       window.onload = function () {
         display();
-        activateButton("stop_button");
+        activateDirectionButtons("stop_button");
+        activateAutopilotButton("autopilot_off_button");
       };
     </script>
   </body>
