@@ -31,8 +31,10 @@ HTML510Server html_server(80);
 #define MOTOR_0 5  // motor 0 left pwm
 #define MOTOR_1 6  // motor 1 right pwm
 // motor directions
-#define DIR_PIN_00 7   // motor 0 direction control pin 0
-#define DIR_PIN_01 10  // motor 0 direction control pin 1
+// #define DIR_PIN_00 7   // motor 0 direction control pin 0
+// #define DIR_PIN_01 10  // motor 0 direction control pin 1
+#define DIR_PIN_00 10   // motor 0 direction control pin 0
+#define DIR_PIN_01 7  // motor 0 direction control pin 1
 #define DIR_PIN_10 18  // motor 1 direction control pin 0
 #define DIR_PIN_11 19  // motor 1 direction control pin 1
 
@@ -124,7 +126,7 @@ int desiredSpeedRWheel(char action) {
     case 'F':
       return des_speed;
     case 'B':
-      return -des_speed;
+      return des_speed;
     case 'L':  // faster, but cannot be faster than 16384
       rate /= 100;
       Rspeed = des_speed * (1.0 + 0.5 * rate);
@@ -410,37 +412,36 @@ void loop() {
       ledcWrite(LEDC_0, 0);
       ledcWrite(LEDC_1, 0);
     } else {
-      if (call_PID_flag_0 == 1) {
-        int setpoint_0 = motor_0_des_speed;
-        int output_0 = calculatePID_0(setpoint_0, Kp, Ki, Kd, last_RPM_0, lastTime_0, RPM_0);
-        int motorSpeed_0 = map(output_0, -80, 40, 4095, 0);
-        ledcWrite(LEDC_0, motorSpeed_0);
-        call_PID_flag_0 = 0;
-        encoderCount_0 = 0;
-      }
-      if (call_PID_flag_1 == 1) {
-        int setpoint_1 = motor_1_des_speed;
-        int output_1 = calculatePID_0(setpoint_1, Kp, Ki, Kd, last_RPM_1, lastTime_1, RPM_1);
-        int motorSpeed_1 = map(output_1, -80, 40, 4095, 0);
-        ledcWrite(LEDC_1, motorSpeed_1);
-        call_PID_flag_1 = 0;
-        encoderCount_1 = 0;
-      }
-      // ledcWrite(LEDC_0, motor_0_des_speed);
-      // ledcWrite(LEDC_1, motor_1_des_speed);
+      // if (call_PID_flag_0 == 1) {
+      //   int setpoint_0 = motor_0_des_speed / 50;  // convert 0-4095 to about 0-80
+      //   int output_0 = calculatePID_0(setpoint_0, Kp, Ki, Kd, last_RPM_0, lastTime_0, RPM_0);
+      //   int motorSpeed_0 = map(output_0, -80, 40, 4095, 0);
+      //   ledcWrite(LEDC_0, motorSpeed_0);
+      //   call_PID_flag_0 = 0;
+      //   encoderCount_0 = 0;
+      // }
+      // if (call_PID_flag_1 == 1) {
+      //   int setpoint_1 = motor_1_des_speed / 50;  // convert 0-4095 to about 0-80
+      //   int output_1 = calculatePID_1(setpoint_1, Kp, Ki, Kd, last_RPM_1, lastTime_1, RPM_1);
+      //   int motorSpeed_1 = map(output_1, -80, 40, 4095, 0);
+      //   ledcWrite(LEDC_1, motorSpeed_1);
+      //   call_PID_flag_1 = 0;
+      //   encoderCount_1 = 0;
+      // }
+      ledcWrite(LEDC_0, motor_0_des_speed);
+      ledcWrite(LEDC_1, motor_1_des_speed);
       Serial.print("\nMotor 0: ");
       Serial.print(motor_0_des_speed);
       Serial.print("\tMotor 1: ");
       Serial.print(motor_1_des_speed);
     }
 
-    Serial.print("\nDes spd ");
-    Serial.print(des_speed);
-    Serial.print("\tTurn rate: ");
-    Serial.print(turn_rate);
+    // Serial.print("\nDes spd ");
+    // Serial.print(des_speed);
+    // Serial.print("\tTurn rate: ");
+    // Serial.print(turn_rate);
     // Serial.print("\nStop flag: ");
     // Serial.print(stop_flag);
-
     delay(200);
   } else {
     int i = 0;
@@ -457,6 +458,7 @@ void loop() {
       delay(autopilot_time_arr[i]);
       i++;
     }
+    // no delay in this case
   }
 }
 
@@ -464,20 +466,32 @@ void loop() {
 void handleEncoderInterrupt_0() {
   encoderCount_0++;
   if (encoderCount_0 == 1) {
+    // clear encoder count for the next interrupt
+    encoderCount_0 = 0;
+    // set pid flag to call pid
     call_PID_flag_0 = 1;
+
     unsigned long currentTime = millis();
     deltaTime_0 = (currentTime - lastTime_0);  // Convert milliseconds to seconds
     RPM_0 = (60 * 1 * 1000) / (20 * deltaTime_0);
+    Serial.print("\nRPM0: ");
+    Serial.print(RPM_0);
     lastTime_0 = currentTime;
   }
 }
 void handleEncoderInterrupt_1() {
   encoderCount_1++;
   if (encoderCount_1 == 1) {
+    // clear encoder count for the next interrupt
+    encoderCount_1 = 0;
+    // set pid flag to call pid
     call_PID_flag_1 = 1;
+
     unsigned long currentTime = millis();
     deltaTime_1 = (currentTime - lastTime_1);  // Convert milliseconds to seconds
     RPM_1 = (60 * 1 * 1000) / (20 * deltaTime_1);
+    Serial.print("\tRPM1: ");
+    Serial.print(RPM_1);
     lastTime_1 = currentTime;
   }
 }

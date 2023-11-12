@@ -128,7 +128,7 @@ const char body[] PROGMEM = R"===(
         type="range"
         min="0"
         max="4095"
-        value="0"
+        value="4000"
         class="slider"
         id="speed_slider"
         oninput="displaySpeed()"
