@@ -1,3 +1,4 @@
+const char body[] PROGMEM = R"===(
 <!DOCTYPE html>
 <html>
   <head>
@@ -287,3 +288,5 @@
     </script>
   </body>
 </html>
+
+)===";
