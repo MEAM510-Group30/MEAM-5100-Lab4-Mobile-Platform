@@ -20,28 +20,35 @@ float last_RPM_1 = 0;
 float integral_0 = 0;
 float integral_1 = 0;
 float derivative_0 = 0;
+float derivative_1 = 0;
 
-int Output = 0;
-float RPM = 0.0;
-float deltaTime = 0.0;
+int Output_0 = 0;  // seems unused
+float RPM_0 = 0.0;
+float RPM_1 = 0.0;
+float deltaTime_0 = 0.0;
+float deltaTime_1 = 0.0;
 
-unsigned long lastTime = 0, currentTime = 0;
+unsigned long lastTime_0 = 0;
+unsigned long lastTime_1 = 0;
+unsigned long currentTime_0 = 0;  // seems usused
+unsigned long currentTime_1 = 0;
 
-int Cal_PID_Flag = 0;
+int call_PID_flag_0 = 0;
+int call_PID_flag_1 = 0;
 
 
-int calculatePID(float setpoint, float Kp, float Ki, float Kd, float &lastInput, unsigned long &lastTime, float RPM)
+int calculatePID_0(float setpoint, float Kp, float Ki, float Kd, float &lastInput, unsigned long &lastTime, float RPM_val)
 {
   // Serial.print("RPM: ");
   // Serial.println(RPM);
   // Serial.print("DeltaTime: ");
   // Serial.println(deltaTime);
 
-  float error = setpoint - RPM;
+  float error = setpoint - RPM_val;
   // float integral = integral + error;
   integral_0 = integral_0 + error;
-  float derivative = 1000 * (RPM - last_RPM_0) / 1;
-  int output = Kp * error + Ki * integral_0 + constrain(Kd * derivative, -0.1 * Kp * error, 0.1 * Kp * error);
+  derivative_0 = 1000 * (RPM_val - last_RPM_0) / 1;
+  int output = Kp * error + Ki * integral_0 + constrain(Kd * derivative_0, -0.1 * Kp * error, 0.1 * Kp * error);
   output = constrain(output, -80, 40);
 
   // Print individual components for debugging
@@ -57,7 +64,7 @@ int calculatePID(float setpoint, float Kp, float Ki, float Kd, float &lastInput,
   // Serial.println(output);
   // Serial.println(error);
 
-  last_RPM_0 = RPM;
+  last_RPM_0 = RPM_val;
   return output;
 }
 
@@ -76,21 +83,18 @@ void setup() {
 }
 
 void loop() {
-
-
   int setpoint = 70;
 
-  if (Cal_PID_Flag == 1) {
-    int output = calculatePID(setpoint, Kp, Ki, Kd, last_RPM_0, lastTime, RPM);
+  if (call_PID_flag_0 == 1) {
+    int output = calculatePID_0(setpoint, Kp, Ki, Kd, last_RPM_0, lastTime_0, RPM_0);
     int motorSpeed = map(output, -80, 40, 4095, 0);
 
     ledcWrite(LEDC_0, motorSpeed);
     // Serial.print("PWM: ");
     // Serial.println(motorSpeed);
-    Cal_PID_Flag = 0;
+    call_PID_flag_0 = 0;
     encoderCount_0 = 0;
   }
-
   //delay(50);
 }
 
@@ -98,10 +102,10 @@ void loop() {
 void handleEncoderInterrupt() {
   encoderCount_0++;
   if (encoderCount_0 == 1) {
-    Cal_PID_Flag = 1;
+    call_PID_flag_0 = 1;
     unsigned long currentTime = millis();
-    deltaTime = (currentTime - lastTime);  // Convert milliseconds to seconds
-    RPM = (60 * 1 * 1000) / (20 * deltaTime);
-    lastTime = currentTime;
+    deltaTime_0 = (currentTime - lastTime_0);  // Convert milliseconds to seconds
+    RPM_0 = (60 * 1 * 1000) / (20 * deltaTime_0);
+    lastTime_0 = currentTime;
   }
 }

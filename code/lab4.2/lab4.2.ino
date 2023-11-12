@@ -41,16 +41,16 @@ HTML510Server html_server(80);
 #define LEDC_0 0 // motor 0 left
 #define LEDC_1 1 // motor 1 right
 // pwm properties
-#define LEDC_RES_BITS 12 // ADC resolution bit
+#define LEDC_RES_BITS 12 // LEDC resolution bit
 #define LEDC_RES ((1 << LEDC_RES_BITS) - 1)
 #define LEDC_FREQ 5000
 
 // motor global variables
-int des_speed = 0;         // car desired speed, 0 - 16383
+int des_speed = 0;         // car desired speed, 0 - 4095
 uint8_t motor_0_dir = 1;   // left wheel, 1 - forward, 0 - backward
 uint8_t motor_1_dir = 1;   // right wheel, 1 - forward, 0 - backward
-int motor_0_des_speed = 0; // left wheel, 0 - 16383
-int motor_1_des_speed = 0; // right wheel, 0 - 16383
+int motor_0_des_speed = 0; // left wheel, 0 - 4095
+int motor_1_des_speed = 0; // right wheel, 0 - 4095
 int turn_rate = 20;        // speed diff between L R wheel when turning, 0 - 100
 uint8_t stop_flag = 0;     // 1 - stop, 0 - not stop
 char curr_action = 'O';    // default is stop
@@ -67,7 +67,7 @@ uint8_t autopilot_flag = 0; // default is inactive 0, 1 is active
 const int autopilot_series_len = 20;
 int autopilot_time_arr[autopilot_series_len] = {2000, 500, 2000, 500, -1};             // delay ms for each action, -1 means end
 char autopilot_action_arr[autopilot_series_len] = {'F', 'R', 'F', 'O', 'Z'};           // 'F' 'B' 'L' 'R' 'O', 'Z' means end
-int autopilot_speed_arr[autopilot_series_len] = { 10000, 10000, 10000, 10000, 10000 }; // 0-16383, -1 means end
+int autopilot_speed_arr[autopilot_series_len] = { 3500, 3500, 3500, 3500, 3500 }; // 0-4095, -1 means end
 int8_t autopilot_turnrate_arr[autopilot_series_len] = { 30, 30, 30, 30, 30 };          // 0 - 100, -1 means end
 
 void getEncoderData()
@@ -216,7 +216,7 @@ void handleRoot()
 
 void handleSpeed()
 {
-  des_speed = html_server.getVal(); // speed range from 0-16383, percent of duty cycle
+  des_speed = html_server.getVal(); // speed range from 0-4095, percent of duty cycle
   Serial.print("\nHandle Speed: ");
   Serial.print(des_speed);
 }
