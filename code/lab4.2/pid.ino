@@ -69,7 +69,8 @@ int calculatePID_0(float setpoint, float Kp, float Ki, float Kd, float &lastInpu
 }
 
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 
   // 初始化LEDC用于电机控制
@@ -82,7 +83,8 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(ENCODER_0), handleEncoderInterrupt, HIGH);
 }
 
-void loop() {
+void loop()
+{
   int setpoint = 70;
 
   if (call_PID_flag_0 == 1) {
@@ -99,7 +101,8 @@ void loop() {
 }
 
 
-void handleEncoderInterrupt() {
+void handleEncoderInterrupt()
+{
   encoderCount_0++;
   if (encoderCount_0 == 1) {
     call_PID_flag_0 = 1;
