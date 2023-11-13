@@ -120,7 +120,7 @@ const char body[] PROGMEM = R"===(
         oninput="displayTurnRate()"
       />
     </div>
-    <p>Turn rate: <span id="turn_rate_val"></span>%</p>    
+    <p>Turn rate: <span id="turn_rate_val"></span>%</p>
 
     <h2>Speed Control</h2>
     <div style="text-align: center">
@@ -146,12 +146,12 @@ const char body[] PROGMEM = R"===(
         On
       </button>
       <button
-      id="autopilot_off_button"
-      class="button"
-      onclick="activateAutopilotButton('autopilot_off_button')"
-    >
-      Off
-    </button>
+        id="autopilot_off_button"
+        class="button"
+        onclick="activateAutopilotButton('autopilot_off_button')"
+      >
+        Off
+      </button>
     </div>
 
     <script>
@@ -248,8 +248,12 @@ const char body[] PROGMEM = R"===(
 
       function activateAutopilotButton(buttonId) {
         // get the button element by id
-        var autopilot_on_button = document.getElementById("autopilot_on_button");
-        var autopilot_off_button = document.getElementById("autopilot_off_button");
+        var autopilot_on_button = document.getElementById(
+          "autopilot_on_button"
+        );
+        var autopilot_off_button = document.getElementById(
+          "autopilot_off_button"
+        );
 
         removeAllActiveAutopilotButtons(); // remove all active class from the buttons
 
@@ -271,29 +275,39 @@ const char body[] PROGMEM = R"===(
       }
 
       function removeAllActiveAutopilotButtons() {
-        var autopilot_on_button = document.getElementById("autopilot_on_button");
-        var autopilot_off_button = document.getElementById("autopilot_off_button");
+        var autopilot_on_button = document.getElementById(
+          "autopilot_on_button"
+        );
+        var autopilot_off_button = document.getElementById(
+          "autopilot_off_button"
+        );
 
         autopilot_on_button.classList.remove("active");
         autopilot_off_button.classList.remove("active");
       }
-      
+
       function speedup() {
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "+", true);
-        xhttp.send();
+        if (prev_state != "+") {
+          var xhttp = new XMLHttpRequest();
+          xhttp.open("GET", "+", true);
+          xhttp.send();
+        }
       }
 
       function slowdown() {
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "-", true);
-        xhttp.send();
+        if (prev_state != "-") {
+          var xhttp = new XMLHttpRequest();
+          xhttp.open("GET", "-", true);
+          xhttp.send();
+        }
       }
 
       var prev_state = null;
       document.addEventListener("keypress", function (event) {
-        if(event.key == prev_state){return;}
-        if (event.key == 'w') {
+        if (event.key == prev_state) {
+          return;
+        }
+        if (event.key == "w") {
           activateDirectionButtons("forward_button");
         }
         if (event.key == "s") {
@@ -303,15 +317,15 @@ const char body[] PROGMEM = R"===(
           activateDirectionButtons("left_button");
         }
         if (event.key == "d") {
-          activateDirectionButtons("right_button"); 
+          activateDirectionButtons("right_button");
         }
         if (event.key == "x") {
           activateDirectionButtons("stop_button");
         }
-        if (event.key == '+') {
+        if (event.key == "+" && prev_state != "+") {
           speedup();
         }
-        if (event.key == '-') {
+        if (event.key == "-" && prev_state != "-") {
           slowdown();
         }
         prev_state = event.key;
@@ -319,7 +333,12 @@ const char body[] PROGMEM = R"===(
 
       // release WASD keys
       document.addEventListener("keyup", function (event) {
-        if (prev_state == 'w' || prev_state == 's' || prev_state == 'a' || prev_state == 'd') {
+        if (
+          prev_state == "w" ||
+          prev_state == "s" ||
+          prev_state == "a" ||
+          prev_state == "d"
+        ) {
           activateDirectionButtons("stop_button");
           prev_state = null;
         }

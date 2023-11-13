@@ -63,7 +63,7 @@ int encoderCount_0 = 0;
 int encoderCount_1 = 0;
 volatile unsigned long prevTime_0 = 0;
 volatile unsigned long prevTime_1 = 0;
-float Kp = 2, Ki = 0.3, Kd = 0.001;
+float Kp = 2, Ki = 0.3, Kd = 0.001;  // PID parameters
 float last_RPM_0 = 0;
 float last_RPM_1 = 0;
 float integral_0 = 0;
@@ -97,23 +97,22 @@ int8_t autopilot_turnrate_arr[autopilot_series_len] = { 30, 30, 30, 30, 30 };   
 int desiredSpeedLWheel(char action) {
   float rate = turn_rate;
   float Lspeed;
-  des_speed += des_speed_delta;
   switch (action) {
     case 'F':
-      return des_speed;
+      return des_speed + des_speed_delta;
     case 'B':
-      return des_speed;
+      return des_speed + des_speed_delta;
     case 'L':  // slower
       rate /= 100;
-      if (des_speed * (1.0 + 0.5 * rate) > LEDC_RES) {
-        Lspeed = des_speed * (1.0 - rate);
+      if ((des_speed + des_speed_delta) * (1.0 + 0.5 * rate) > LEDC_RES) {
+        Lspeed = (des_speed + des_speed_delta) * (1.0 - rate);
       } else {
-        Lspeed = des_speed * (1.0 - 0.5 * rate);
+        Lspeed = (des_speed + des_speed_delta) * (1.0 - 0.5 * rate);
       }
       return (int)Lspeed;
     case 'R':  // faster
       rate /= 100;
-      Lspeed = des_speed * (1.0 + 0.5 * rate);
+      Lspeed = (des_speed + des_speed_delta) * (1.0 + 0.5 * rate);
       if (Lspeed > LEDC_RES)
         Lspeed = LEDC_RES;
       return (int)Lspeed;
@@ -124,24 +123,23 @@ int desiredSpeedLWheel(char action) {
 int desiredSpeedRWheel(char action) {
   float rate = turn_rate;
   float Rspeed;
-  des_speed += des_speed_delta;
   switch (action) {
     case 'F':
-      return des_speed;
+      return des_speed + des_speed_delta;
     case 'B':
-      return des_speed;
+      return des_speed + des_speed_delta;
     case 'L':  // faster, but cannot be faster than 16384
       rate /= 100;
-      Rspeed = des_speed * (1.0 + 0.5 * rate);
+      Rspeed = (des_speed + des_speed_delta) * (1.0 + 0.5 * rate);
       if (Rspeed > LEDC_RES)
         Rspeed = LEDC_RES;
       return (int)Rspeed;
     case 'R':  // slower, but should consider that the other wheel cannot be faster than 16384
       rate /= 100;
-      if (des_speed * (1.0 + 0.5 * rate) > LEDC_RES) {
-        Rspeed = des_speed * (1.0 - rate);
+      if ((des_speed + des_speed_delta) * (1.0 + 0.5 * rate) > LEDC_RES) {
+        Rspeed = (des_speed + des_speed_delta) * (1.0 - rate);
       } else {
-        Rspeed = des_speed * (1.0 - 0.5 * rate);
+        Rspeed = (des_speed + des_speed_delta) * (1.0 - 0.5 * rate);
       }
       return (int)Rspeed;
     default:
