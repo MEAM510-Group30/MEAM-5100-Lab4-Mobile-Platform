@@ -8,7 +8,7 @@
 #include "html510.h"
 
 // wifi and html
-const char *ssid = "芙宁娜";
+const char *ssid = "Furina";
 const char *pwd = "Furinaaa";
 IPAddress local_IP(192, 168, 1, 142);
 IPAddress gateway_IP(192, 168, 1, 1);
@@ -349,24 +349,24 @@ void handleAutopilotOff() {
 // }
 
 void handleSpeedUp() {
-  int delta_speed = 10;
+  int delta_speed = 500;
   if (des_speed + des_speed_delta + delta_speed > 4095) {
     des_speed_delta = 4095 - des_speed;
   } else {
     des_speed_delta += delta_speed;
   }
-  Serial.print("\nSpeed up: ");
-  Serial.print(des_speed + des_speed_delta);
+  // Serial.print("\nSpeed up: ");
+  // Serial.print(des_speed + des_speed_delta);
 }
 void handleSlowDown() {
-  int delta_speed = -10;
+  int delta_speed = -500;
   if (des_speed + delta_speed + des_speed_delta < 1600) {
     des_speed_delta = 1600 - des_speed;
   } else {
     des_speed_delta += delta_speed;
   }
-  Serial.print("\nSlow down: ");
-  Serial.print(des_speed + des_speed_delta);
+  // Serial.print("\nSlow down: ");
+  // Serial.print(des_speed + des_speed_delta);
 }
 
 void setup() {
@@ -436,22 +436,22 @@ void loop() {
       ledcWrite(LEDC_0, 0);
       ledcWrite(LEDC_1, 0);
     } else {
-      // if (call_PID_flag_0 == 1) {
-      //   int setpoint_0 = motor_0_des_speed / 50;  // convert 0-4095 to about 0-80
-      //   int output_0 = calculatePID_0(setpoint_0, Kp, Ki, Kd, last_RPM_0, lastTime_0, RPM_0);
-      //   int motorSpeed_0 = map(output_0, -80, 40, 4095, 0);
-      //   ledcWrite(LEDC_0, motorSpeed_0);
-      //   call_PID_flag_0 = 0;
-      //   encoderCount_0 = 0;
-      // }
-      // if (call_PID_flag_1 == 1) {
-      //   int setpoint_1 = motor_1_des_speed / 50;  // convert 0-4095 to about 0-80
-      //   int output_1 = calculatePID_1(setpoint_1, Kp, Ki, Kd, last_RPM_1, lastTime_1, RPM_1);
-      //   int motorSpeed_1 = map(output_1, -80, 40, 4095, 0);
-      //   ledcWrite(LEDC_1, motorSpeed_1);
-      //   call_PID_flag_1 = 0;
-      //   encoderCount_1 = 0;
-      // }
+      if (call_PID_flag_0 == 1) {
+        int setpoint_0 = motor_0_des_speed / 50;  // convert 0-4095 to about 0-80
+        int output_0 = calculatePID_0(setpoint_0, Kp, Ki, Kd, last_RPM_0, lastTime_0, RPM_0);
+        int motorSpeed_0 = map(output_0, -80, 40, 4095, 0);
+        ledcWrite(LEDC_0, motorSpeed_0);
+        call_PID_flag_0 = 0;
+        encoderCount_0 = 0;
+      }
+      if (call_PID_flag_1 == 1) {
+        int setpoint_1 = motor_1_des_speed / 50;  // convert 0-4095 to about 0-80
+        int output_1 = calculatePID_1(setpoint_1, Kp, Ki, Kd, last_RPM_1, lastTime_1, RPM_1);
+        int motorSpeed_1 = map(output_1, -80, 40, 4095, 0);
+        ledcWrite(LEDC_1, motorSpeed_1);
+        call_PID_flag_1 = 0;
+        encoderCount_1 = 0;
+      }
       ledcWrite(LEDC_0, motor_0_des_speed);
       ledcWrite(LEDC_1, motor_1_des_speed);
       Serial.print("\nMotor 0: ");

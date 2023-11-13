@@ -342,6 +342,12 @@ const char body[] PROGMEM = R"===(
           activateDirectionButtons("stop_button");
           prev_state = null;
         }
+        if (
+          prev_state == "+" ||
+          prev_state == "-"
+        ) {
+          prev_state = null;
+        }
       });
 
       var speed = document.getElementById("speed_slider");
