@@ -79,10 +79,6 @@ unsigned long lastTime_1 = 0;
 int call_PID_flag_0 = 0;
 int call_PID_flag_1 = 0;
 
-// encoder global variables
-int rpm_0 = 0;
-int rpm_1 = 0;
-
 // autopilot activation variable
 uint8_t autopilot_flag = 0;  // default is inactive 0, 1 is active
 const int autopilot_series_len = 20;
@@ -437,29 +433,47 @@ void loop() {
       ledcWrite(LEDC_0, 0);
       ledcWrite(LEDC_1, 0);
     } else {
+      // when first start, PID won't be called because PID flags are all 0
+      // so we need to get it moving to let the interrupt function change the flags to 1
+      if (call_PID_flag_0 == 0){
+        ledcWrite(LEDC_0, motor_0_des_speed);
+      }
+      if (call_PID_flag_1 == 0){
+        ledcWrite(LEDC_1, motor_1_des_speed);
+      }
+
       // with PID
+      int rpm_error_01 = RPM_0 - RPM_1;  // positive if RPM0 > RPM1
       if (call_PID_flag_0 == 1) {
-        int setpoint_0 = motor_0_des_speed / 50;  // convert 0-4095 to about 0-80
-        int output_0 = calculatePID_0(setpoint_0, Kp, Ki, Kd, last_RPM_0, lastTime_0, RPM_0);
-        int motorSpeed_0 = map(output_0, -80, 40, 4095, 0);
+        int setpoint_0 = motor_0_des_speed / 25;  // convert 0-4095 to about 0-80
+        int output_0 = calculatePID_0(setpoint_0 + rpm_error_01 / 2, Kp, Ki, Kd, last_RPM_0, lastTime_0, RPM_0);
+        int motorSpeed_0 = map(output_0, -100, 100, 4095, 0);
         ledcWrite(LEDC_0, motorSpeed_0);
-        Serial.print("\nPID0: ");
-        Serial.print(motorSpeed_0);
+        // Serial.print("\nPID0: ");
+        // Serial.print(motorSpeed_0);
         call_PID_flag_0 = 0;
         encoderCount_0 = 0;
       }
       if (call_PID_flag_1 == 1) {
-        int setpoint_1 = motor_1_des_speed / 50;  // convert 0-4095 to about 0-80
-        int output_1 = calculatePID_1(setpoint_1, Kp, Ki, Kd, last_RPM_1, lastTime_1, RPM_1);
-        int motorSpeed_1 = map(output_1, -80, 40, 4095, 0);
+        int setpoint_1 = motor_1_des_speed / 25;  // convert 0-4095 to about 0-80
+        int output_1 = calculatePID_1(setpoint_1 - rpm_error_01 / 2, Kp, Ki, Kd, last_RPM_1, lastTime_1, RPM_1);
+        int motorSpeed_1 = map(output_1, -100, 100, 4095, 0);
         ledcWrite(LEDC_1, motorSpeed_1);
-        Serial.print("\nPID1: ");
-        Serial.print(motorSpeed_1);
+        // Serial.print("\nPID1: ");
+        // Serial.print(motorSpeed_1);
         call_PID_flag_1 = 0;
         encoderCount_1 = 0;
       }
-      
-      // without PID
+
+      // print rpm
+      Serial.print("\n N0: ");
+      Serial.print(RPM_0);
+      Serial.print("\t N1: ");
+      Serial.print(RPM_1);
+      Serial.print("\t N0-N1: ");
+      Serial.print(RPM_0 - RPM_1);
+
+      // // without PID
       // ledcWrite(LEDC_0, motor_0_des_speed);
       // ledcWrite(LEDC_1, motor_1_des_speed);
 
@@ -475,7 +489,7 @@ void loop() {
     // Serial.print(turn_rate);
     // Serial.print("\nStop flag: ");
     // Serial.print(stop_flag);
-    delay(10);
+    // delay(10);
   } else {
     int i = 0;
     while (autopilot_flag) {
