@@ -61,6 +61,8 @@ char curr_action = 'O';     // default is stop
 // pid global variables
 int encoderCount_0 = 0;
 int encoderCount_1 = 0;
+int encoderCount_0_nonclear = 0;
+int encoderCount_1_nonclear = 0;
 volatile unsigned long prevTime_0 = 0;
 volatile unsigned long prevTime_1 = 0;
 float Kp = 2, Ki = 0.3, Kd = 0.001;  // PID parameters
@@ -512,6 +514,7 @@ void loop() {
 
 void handleEncoderInterrupt_0() {
   encoderCount_0++;
+	encoderCount_0_nonclear++;
   if (encoderCount_0 == 1) {
     // clear encoder count for the next interrupt
     encoderCount_0 = 0;
@@ -528,6 +531,7 @@ void handleEncoderInterrupt_0() {
 }
 void handleEncoderInterrupt_1() {
   encoderCount_1++;
+	encoderCount_1_nonclear++;
   if (encoderCount_1 == 1) {
     // clear encoder count for the next interrupt
     encoderCount_1 = 0;
