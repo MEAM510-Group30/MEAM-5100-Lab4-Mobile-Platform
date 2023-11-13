@@ -242,7 +242,8 @@ void handleSpeed() {
 
 void handleTurnRate() {
   turn_rate = html_server.getVal();  // turn rate range from -100-100, percent of speed difference between left and right wheel
-  Serial.print("\nHandle Turn Rate");
+  Serial.print("\nHandle Turn Rate: ");
+  Serial.print(turn_rate);
 }
 
 void handleForward() {
@@ -256,7 +257,7 @@ void handleForward() {
   // motor_1_dir = 1;
   // digitalWrite(DIR_PIN_10, HIGH);
   // digitalWrite(DIR_PIN_11, LOW);
-  Serial.print("\nDirection: Forward");
+  //Serial.print("\nDirection: Forward");
   // motor_0_des_speed = desiredSpeedLWheel('F');
   // motor_1_des_speed = desiredSpeedRWheel('F');
 }
@@ -272,7 +273,7 @@ void handleBackward() {
   // motor_1_dir = 0;
   // digitalWrite(DIR_PIN_10, LOW);
   // digitalWrite(DIR_PIN_11, HIGH);
-  Serial.print("\nDirection: Backward");
+  //Serial.print("\nDirection: Backward");
   // motor_0_des_speed = desiredSpeedLWheel('B');
   // motor_1_des_speed = desiredSpeedRWheel('B');
 }
@@ -288,7 +289,7 @@ void handleForwardLeft() {
   // motor_1_dir = 1;
   // digitalWrite(DIR_PIN_10, HIGH);
   // digitalWrite(DIR_PIN_11, LOW);
-  Serial.print("\nDirection: Forward Left");
+  //Serial.print("\nDirection: Forward Left");
   // motor_0_des_speed = desiredSpeedLWheel('L');
   // motor_1_des_speed = desiredSpeedRWheel('L');
 }
@@ -304,7 +305,7 @@ void handleForwardRight() {
   // motor_1_dir = 1;
   // digitalWrite(DIR_PIN_10, HIGH);
   // digitalWrite(DIR_PIN_11, LOW);
-  Serial.print("\nDirection: Forward Right");
+  //Serial.print("\nDirection: Forward Right");
   // motor_0_des_speed = desiredSpeedLWheel('R');
   // motor_1_des_speed = desiredSpeedRWheel('R');
 }
@@ -314,7 +315,7 @@ void handleStop() {
   // takeAction();
 
   // stop_flag = 1;
-  Serial.print("\nDirection: Stop");
+  //Serial.print("\nDirection: Stop");
   // motor_0_des_speed = desiredSpeedLWheel('O');
   // motor_1_des_speed = desiredSpeedRWheel('O');
 }
@@ -436,11 +437,14 @@ void loop() {
       ledcWrite(LEDC_0, 0);
       ledcWrite(LEDC_1, 0);
     } else {
+      // with PID
       if (call_PID_flag_0 == 1) {
         int setpoint_0 = motor_0_des_speed / 50;  // convert 0-4095 to about 0-80
         int output_0 = calculatePID_0(setpoint_0, Kp, Ki, Kd, last_RPM_0, lastTime_0, RPM_0);
         int motorSpeed_0 = map(output_0, -80, 40, 4095, 0);
         ledcWrite(LEDC_0, motorSpeed_0);
+        Serial.print("\nPID0: ");
+        Serial.print(motorSpeed_0);
         call_PID_flag_0 = 0;
         encoderCount_0 = 0;
       }
@@ -449,15 +453,20 @@ void loop() {
         int output_1 = calculatePID_1(setpoint_1, Kp, Ki, Kd, last_RPM_1, lastTime_1, RPM_1);
         int motorSpeed_1 = map(output_1, -80, 40, 4095, 0);
         ledcWrite(LEDC_1, motorSpeed_1);
+        Serial.print("\nPID1: ");
+        Serial.print(motorSpeed_1);
         call_PID_flag_1 = 0;
         encoderCount_1 = 0;
       }
-      ledcWrite(LEDC_0, motor_0_des_speed);
-      ledcWrite(LEDC_1, motor_1_des_speed);
-      Serial.print("\nMotor 0: ");
-      Serial.print(motor_0_des_speed);
-      Serial.print("\tMotor 1: ");
-      Serial.print(motor_1_des_speed);
+      
+      // without PID
+      // ledcWrite(LEDC_0, motor_0_des_speed);
+      // ledcWrite(LEDC_1, motor_1_des_speed);
+
+      // Serial.print("\nMotor 0: ");
+      // Serial.print(motor_0_des_speed);
+      // Serial.print("\tMotor 1: ");
+      // Serial.print(motor_1_des_speed);
     }
 
     // Serial.print("\nDes spd ");
@@ -466,7 +475,7 @@ void loop() {
     // Serial.print(turn_rate);
     // Serial.print("\nStop flag: ");
     // Serial.print(stop_flag);
-    delay(200);
+    delay(10);
   } else {
     int i = 0;
     while (autopilot_flag) {
@@ -498,8 +507,8 @@ void handleEncoderInterrupt_0() {
     unsigned long currentTime = millis();
     deltaTime_0 = (currentTime - lastTime_0);  // Convert milliseconds to seconds
     RPM_0 = (60 * 1 * 1000) / (20 * deltaTime_0);
-    Serial.print("\nRPM0: ");
-    Serial.print(RPM_0);
+    // Serial.print("\nRPM0: ");
+    // Serial.print(RPM_0);
     lastTime_0 = currentTime;
   }
 }
@@ -514,8 +523,8 @@ void handleEncoderInterrupt_1() {
     unsigned long currentTime = millis();
     deltaTime_1 = (currentTime - lastTime_1);  // Convert milliseconds to seconds
     RPM_1 = (60 * 1 * 1000) / (20 * deltaTime_1);
-    Serial.print("\tRPM1: ");
-    Serial.print(RPM_1);
+    // Serial.print("\tRPM1: ");
+    // Serial.print(RPM_1);
     lastTime_1 = currentTime;
   }
 }
