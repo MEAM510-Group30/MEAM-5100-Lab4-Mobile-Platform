@@ -86,11 +86,11 @@ uint8_t autopilot_flag = 0;           // autopilot activation variable, default 
 const int autopilot_series_len = 50;  // max number of actions autopilot will take
 // int autopilot_time_arr[autopilot_series_len] = { 2000, 500, 2000, 500, -1 };       // delay ms for each action, -1 means end
 char autopilot_action_arr[autopilot_series_len] = { 'F', 'F', 'R', 'F', 'F', 'R', 'F', 'F', 'R', 'F', 'F', 'R', 'Z' };      // 'F' 'B' 'L' 'R' 'O', 'Z' means end
-int autopilot_speed_arr[autopilot_series_len] = { 4090, 1600, 3500, 4090, 1600, 3500, 4090, 1600, 3500, 4090, 1600, 3500, -1 };    // 0-4095, -1 means end
+int autopilot_speed_arr[autopilot_series_len] = { 4090, 1700, 3500, 4090, 1700, 3500, 4090, 1700, 3500, 4090, 1700, 3500, -1 };    // 0-4095, -1 means end
 int8_t autopilot_turnrate_arr[autopilot_series_len] = { 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100 };  // 0 - 100, -1 means end
 // int autopilot_counter_Lwheel[autopilot_series_len] = { 98, 0, 98, -1 };            // counts is equivalent to distance, 1 count = 10.205 mm, -1 means end
 // int autopilot_counter_Rwheel[autopilot_series_len] = { 98, 20, 98, -1 };           // counts is equivalent to distance, 1 count = 10.205 mm, -1 means end
-int autopilot_dist_counter[autopilot_series_len] = { 150, 8, 12, 90, 8, 13, 150, 8, 12, 90, 8, 13, -1 };  // average count of R and L wheel, 1 count = 10.205 mm, -1 means end
+int autopilot_dist_counter[autopilot_series_len] = { 101, 8, 12, 60, 8, 13, 101, 8, 12, 60, 8, 13, -1 };  // average count of R and L wheel, 1 count = 10.205 mm, -1 means end
 int autopilot_action_count = 0;                                         // indicate the index of current autopilot actions
 
 
@@ -233,47 +233,40 @@ void takeAction() {
   }
 }
 
+
 void handleRoot() {
   html_server.sendhtml(body);
 }
-
 void handleSpeed() {
   des_speed = html_server.getVal();  // speed range from 0-4095, percent of duty cycle
   Serial.print("\nHandle Speed: ");
   Serial.print(des_speed);
 }
-
 void handleTurnRate() {
   turn_rate = html_server.getVal();  // turn rate range from -100-100, percent of speed difference between left and right wheel
   Serial.print("\nHandle Turn Rate: ");
   Serial.print(turn_rate);
 }
-
 void handleForward() {
   curr_action = 'F';
   // Serial.print("\nDirection: Forward");
 }
-
 void handleBackward() {
   curr_action = 'B';
   // Serial.print("\nDirection: Backward");
 }
-
 void handleForwardLeft() {
   curr_action = 'L';
   // Serial.print("\nDirection: Forward Left");
 }
-
 void handleForwardRight() {
   curr_action = 'R';
   // Serial.print("\nDirection: Forward Right");
 }
-
 void handleStop() {
   curr_action = 'O';
   // Serial.print("\nDirection: Stop");
 }
-
 // autopilot will automatically complete the circle
 // activate/deactivate autopilot
 void handleAutopilotOn() {
@@ -308,7 +301,6 @@ void handleAutopilotOff() {
 //     i++;
 //   }
 // }
-
 void handleSpeedUp() {
   int delta_speed = 500;
   if (des_speed + des_speed_delta + delta_speed > 4095) {
@@ -329,6 +321,7 @@ void handleSlowDown() {
   // Serial.print("\nSlow down: ");
   // Serial.print(des_speed + des_speed_delta);
 }
+
 
 void setup() {
   Serial.begin(115200);
@@ -387,6 +380,7 @@ void setup() {
   html_server.attachHandler("/-", handleSlowDown);
   delay(500);
 }
+
 
 void loop() {
   html_server.serve();
