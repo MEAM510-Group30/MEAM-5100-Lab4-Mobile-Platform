@@ -239,13 +239,13 @@ void handleRoot() {
 }
 void handleSpeed() {
   des_speed = html_server.getVal();  // speed range from 0-4095, percent of duty cycle
-  Serial.print("\nHandle Speed: ");
-  Serial.print(des_speed);
+  // Serial.print("\nHandle Speed: ");
+  // Serial.print(des_speed);
 }
 void handleTurnRate() {
   turn_rate = html_server.getVal();  // turn rate range from -100-100, percent of speed difference between left and right wheel
-  Serial.print("\nHandle Turn Rate: ");
-  Serial.print(turn_rate);
+  // Serial.print("\nHandle Turn Rate: ");
+  // Serial.print(turn_rate);
 }
 void handleForward() {
   curr_action = 'F';
@@ -274,7 +274,7 @@ void handleAutopilotOn() {
   stop_flag = 0;
   encoderCount_0_nonclear = 0;  // clear these so that the distance of autopilot is 0 when starting
   encoderCount_1_nonclear = 0;
-  Serial.print("\nAutopilot activated");
+  // Serial.print("\nAutopilot activated");
 }
 void handleAutopilotOff() {
   autopilot_flag = 0;
@@ -283,7 +283,7 @@ void handleAutopilotOff() {
   encoderCount_0_nonclear = 0;
   encoderCount_1_nonclear = 0;
   autopilot_action_count = 0;  // wait for autopilot to be activated next time
-  Serial.print("\nAutopilot deactivated");
+  // Serial.print("\nAutopilot deactivated");
 }
 // // autopilot
 // void missionPlanner() {
@@ -332,12 +332,12 @@ void setup() {
   WiFi.softAP(ssid, pwd);
   wifi_server.begin();
   IPAddress softAP_IP = WiFi.softAPIP();
-  Serial.print("\n AP IP address: ");
-  Serial.print(softAP_IP);
-  Serial.print("\n SSID: ");
-  Serial.print(ssid);
-  Serial.print("\n Password: ");
-  Serial.print(pwd);
+  // Serial.print("\n AP IP address: ");
+  // Serial.print(softAP_IP);
+  // Serial.print("\n SSID: ");
+  // Serial.print(ssid);
+  // Serial.print("\n Password: ");
+  // Serial.print(pwd);
 
   // ledc setup
   ledcSetup(LEDC_0, LEDC_FREQ, LEDC_RES_BITS);
@@ -543,12 +543,12 @@ void loop() {
       }
 
       // print rpm
-      Serial.print("\n N0: ");
-      Serial.print(RPM_0);
-      Serial.print("\t N1: ");
-      Serial.print(RPM_1);
-      Serial.print("\t N0-N1: ");
-      Serial.print(RPM_0 - RPM_1);
+      // Serial.print("\n N0: ");
+      // Serial.print(RPM_0);
+      // Serial.print("\t N1: ");
+      // Serial.print(RPM_1);
+      // Serial.print("\t N0-N1: ");
+      // Serial.print(RPM_0 - RPM_1);
 
       // Serial.print("\n");
       // Serial.print(motor_0_des_speed);
